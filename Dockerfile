@@ -19,4 +19,5 @@ RUN chown app:app .
 COPY --from=publish --chown=app:app /app/publish .
 
 USER app
+RUN mkdir -p wwwroot/media
 ENTRYPOINT ["dotnet", "UmbracoDocker.dll"]
