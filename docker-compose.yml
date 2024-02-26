@@ -6,6 +6,8 @@ services:
       - ACCEPT_EULA=Y
     ports:
       - 5434:1433
+    volumes:
+      - sqldata:/var/opt/mssql:rw
   umbraco:
     depends_on:
       - database
@@ -18,3 +20,4 @@ services:
       - media:/app/wwwroot/media:rw
 volumes:
   media:
+  sqldata:
