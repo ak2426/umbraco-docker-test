@@ -7,17 +7,34 @@ services:
     ports:
       - 5434:1433
     volumes:
-      - sqldata:/var/opt/mssql:rw
-  umbraco:
+      - sqldata:/var/opt/mssql
+  db-init:
     depends_on:
       - database
+    image: mcr.microsoft.com/mssql-tools:latest
+    command:
+      - /bin/sh
+      - -c
+      - |
+        /opt/mssql-tools/bin/sqlcmd -S database -U sa -P Pass@word << EOF
+        IF NOT EXISTS(SELECT * FROM sys.databases WHERE name = 'umbraco-cms')
+        BEGIN
+          CREATE DATABASE [umbraco-cms]
+        END
+        GO
+        EXIT
+        EOF
+    restart: no
+  umbraco:
+    depends_on:
+      - db-init
     build:
       context: .
       dockerfile: ./Dockerfile
     ports:
       - 5000:5000
     volumes:
-      - media:/app/wwwroot/media:rw
+      - media:/app/wwwroot/media
 volumes:
   media:
   sqldata:
