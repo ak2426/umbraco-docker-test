@@ -24,11 +24,8 @@ To work around this, there is an extra service called `db-init` to create the da
 Its sole purpose is to run the following T-SQL code and exit.
 
 ```sql
-IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'umbraco-cms')
-BEGIN
-    CREATE DATABASE [umbraco-cms]
-END
-GO
+IF NOT EXISTS (SELECT 1 FROM sys.databases WHERE name = 'UmbracoCMS')
+    CREATE DATABASE UmbracoCMS
 ```
 
 In many production scenarios it is preferable to use an external database.

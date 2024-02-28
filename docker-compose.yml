@@ -16,18 +16,18 @@ services:
       - /bin/sh
       - -c
       - |
-        /opt/mssql-tools/bin/sqlcmd -S database -U sa -P Pass@word << EOF
-        IF NOT EXISTS(SELECT * FROM sys.databases WHERE name = 'umbraco-cms')
-        BEGIN
-          CREATE DATABASE [umbraco-cms]
-        END
-        GO
-        EXIT
-        EOF
+        until /opt/mssql-tools/bin/sqlcmd -S database -U sa -P Pass@word -Q \
+          "IF NOT EXISTS (SELECT 1 FROM sys.databases WHERE name = 'UmbracoCMS')
+          CREATE DATABASE UmbracoCMS"
+        do
+          echo Retry...
+          sleep 1
+        done
     restart: no
   umbraco:
     depends_on:
-      - db-init
+      db-init:
+        condition: service_completed_successfully
     build:
       context: .
       dockerfile: ./Dockerfile
