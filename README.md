@@ -33,7 +33,25 @@ This Docker Compose solution is mainly provided for the sake of completeness.
 
 ## Usage
 
-This section is a work in progress.
+The following commands give an example of how to build and run the Docker image after cloning this repository.
+
+```sh
+docker build -t umbraco .
+docker volume create umbraco-media
+
+docker run -it --rm \
+    -e "ConnectionStrings__umbracoDbDSN=$MY_CONNECTION_STRING" \
+    -p "8080:8080" \
+    -v umbraco-media:/app/wwwroot/media \
+    umbraco
+```
+
+Navigate to <http://localhost:8080/umbraco> and login with the following credentials (currently hardcoded in [`appsettings.Production.json`](appsettings.Production.json)):
+
+- Email: `admin@example.com`
+- Password: `admin-password`
+
+### Docker Compose
 
 ```sh
 docker compose up
