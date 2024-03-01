@@ -5,7 +5,7 @@ services:
       - SA_PASSWORD=Pass@word
       - ACCEPT_EULA=Y
     ports:
-      - 5434:1433
+      - 1433:1433
     volumes:
       - sqldata:/var/opt/mssql
   db-init:
@@ -32,7 +32,7 @@ services:
       context: .
       dockerfile: ./Dockerfile
     ports:
-      - 5000:5000
+      - 8080:8080
     volumes:
       - media:/app/wwwroot/media
 volumes:
