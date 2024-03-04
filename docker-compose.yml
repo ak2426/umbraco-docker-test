@@ -13,11 +13,13 @@ services:
       - database
     image: mcr.microsoft.com/mssql-tools:latest
     env_file: .env
+    environment:
+      SQLCMDPASSWORD: ${MSSQL_SA_PASSWORD}
     command:
       - /bin/sh
       - -c
       - |
-        until /opt/mssql-tools/bin/sqlcmd -S database -U sa -P ${MSSQL_SA_PASSWORD} -Q \
+        until /opt/mssql-tools/bin/sqlcmd -S database -U sa -Q \
           "IF NOT EXISTS (SELECT 1 FROM sys.databases WHERE name = 'UmbracoCMS')
           CREATE DATABASE UmbracoCMS"
         do
