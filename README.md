@@ -53,12 +53,25 @@ Navigate to <http://localhost:8080/umbraco> and login with the following credent
 
 ### Docker Compose
 
+Create a file called `.env` with the following keys.
+
+```sh
+MSSQL_SA_PASSWORD="Pass@word"
+```
+
+> [!CAUTION]
+> Special characters in `MSSQL_SA_PASSWORD` must be properly escaped.
+> Refer to Microsoft's documentation on [connection string syntax][connection-string-syntax].
+
+Then run the following command to create and start the containers.
+
 ```sh
 docker compose up
 ```
 
 <!-- Link definitions -->
 
+[connection-string-syntax]: <https://learn.microsoft.com/en-us/sql/connect/ado-net/connection-strings?view=sql-server-ver16#connection-string-syntax> "Connection strings - ADO.NET Provider for SQL Server | Microsoft Learn"
 [docker-mysql]: <https://hub.docker.com/_/mysql> "mysql - Official Image | Docker Hub"
 [docker-postgres]: <https://hub.docker.com/_/postgres> "postgres - Official Image | Docker Hub"
 [docker-mssql-server]: <https://hub.docker.com/_/microsoft-mssql-server> "microsoft-mssql-server - Official Image | Docker Hub"

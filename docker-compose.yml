@@ -1,9 +1,9 @@
 services:
   database:
     image: mcr.microsoft.com/mssql/server:2022-latest
+    env_file: .env
     environment:
-      - SA_PASSWORD=Pass@word
-      - ACCEPT_EULA=Y
+      ACCEPT_EULA: "Y"
     ports:
       - 1433:1433
     volumes:
@@ -12,18 +12,19 @@ services:
     depends_on:
       - database
     image: mcr.microsoft.com/mssql-tools:latest
+    env_file: .env
     command:
       - /bin/sh
       - -c
       - |
-        until /opt/mssql-tools/bin/sqlcmd -S database -U sa -P Pass@word -Q \
+        until /opt/mssql-tools/bin/sqlcmd -S database -U sa -P ${MSSQL_SA_PASSWORD} -Q \
           "IF NOT EXISTS (SELECT 1 FROM sys.databases WHERE name = 'UmbracoCMS')
           CREATE DATABASE UmbracoCMS"
         do
           echo Retry...
           sleep 1
         done
-    restart: no
+    restart: "no"
   umbraco:
     depends_on:
       db-init:
@@ -31,6 +32,14 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+    env_file: .env
+    environment:
+      ConnectionStrings__umbracoDbDSN: >-
+        Server=database;
+        User Id=sa;
+        Password=${MSSQL_SA_PASSWORD};
+        Database=UmbracoCMS;
+        TrustServerCertificate=true;
     ports:
       - 8080:8080
     volumes:
