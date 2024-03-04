@@ -60,7 +60,14 @@ MSSQL_SA_PASSWORD="Pass@word"
 ```
 
 > [!CAUTION]
-> Special characters in `MSSQL_SA_PASSWORD` must be properly escaped.
+> As stated [here][docker-mssql-server], `MSSQL_SA_PASSWORD` must include at least 8 characters of at least three of these four categories:
+>
+> 1. Uppercase letters
+> 2. Lowercase letters
+> 3. Numbers
+> 4. Non-alphanumeric symbols
+>
+> Additionally, any special characters, such as `;`, must be properly escaped.
 > Refer to Microsoft's documentation on [connection string syntax][connection-string-syntax].
 
 Then run the following command to create and start the containers.
