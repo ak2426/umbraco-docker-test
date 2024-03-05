@@ -53,21 +53,20 @@ Navigate to <http://localhost:8080/umbraco> and login with the following credent
 
 ### Docker Compose
 
-Create a file called `.env` with the following keys.
+Create a file called `.env` containing the following keys with your own values.
 
 ```sh
 MSSQL_SA_PASSWORD="Pass@word"
 ```
 
+> [!IMPORTANT]
+> As stated [here][docker-mssql-server], `MSSQL_SA_PASSWORD` must satisfy the password complexity policy:
+> > This password needs to include at least 8 characters of at least three of these four categories: uppercase letters, lowercase letters, numbers and non-alphanumeric symbols.
+
+<!-- block quote separator for markdownlint -->
+
 > [!CAUTION]
-> As stated [here][docker-mssql-server], `MSSQL_SA_PASSWORD` must include at least 8 characters of at least three of these four categories:
->
-> 1. Uppercase letters
-> 2. Lowercase letters
-> 3. Numbers
-> 4. Non-alphanumeric symbols
->
-> Additionally, any special characters, such as `;`, must be properly escaped.
+> Any special characters in `MSSQL_SA_PASSWORD`, such as `;` or `"`, must be properly escaped to avoid breaking the connection string.
 > Refer to Microsoft's documentation on [connection string syntax][connection-string-syntax].
 
 Then run the following command to create and start the containers.
