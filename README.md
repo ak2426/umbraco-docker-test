@@ -1,35 +1,21 @@
 # Umbraco + Docker
 
-Deploy [Umbraco CMS][umbraco-cms] using Docker.
+Deploy [Umbraco CMS][umbraco-cms] in headless production environment using Docker.
 
 ## About
 
-This project was created from scratch starting with the default Umbraco template.
+Umbraco is a decoupled content management system (CMS) written in ASP.NET Core.
+The term *decoupled* refers to an architecture that separates the frontend template system in such a way that using it is not required.
+As a result, Umbraco can be used in nearly headless manner by changing a few configuration settings.
 
-```sh
-dotnet new umbraco -n UmbracoDocker -o .
-```
+The main advantages of headless operation include:
 
-Umbraco has been unfortunately been designed to only support SQL Server + IIS in production mode.
-This makes developing a Docker image for Umbraco somewhat challenging.
-Below are some of the challenges and design considerations for this project.
+- Being able to use any frontend technology stack
+- Increased security due to a smaller attack surface
+- Transferability of design principles to other headless CMS platforms
+- Reduced dependency on plugins for functionality
 
-### SQL Server in Docker
-
-Most official Docker images for databases, such as [PostgreSQL][docker-postgres] and [MySQL][docker-mysql], have an option to specify the default database name via environment variable.
-[Microsoft SQL Server][docker-mssql-server], however, has no such option and will not create any database automatically on startup.
-This [issue][github-mssql-docker] has been unresolved for over 7 years!
-
-To work around this, there is an extra service called `db-init` to create the database if it does not exist already.
-Its sole purpose is to run the following T-SQL code and exit.
-
-```sql
-IF NOT EXISTS (SELECT 1 FROM sys.databases WHERE name = 'UmbracoCMS')
-    CREATE DATABASE UmbracoCMS
-```
-
-In many production scenarios it is preferable to use an external database.
-This Docker Compose solution is mainly provided for the sake of completeness.
+This goal of this project is to provide a lean and portable Docker image that can be used to deploy Umbraco in a headless production environment.
 
 ## Usage
 
@@ -74,6 +60,38 @@ Then run the following command to create and start the containers.
 ```sh
 docker compose up
 ```
+
+## Design Challenges
+
+Umbraco has clearly been made by and for those already knee-deep in Microsoft's software ecosystem.
+The only supported database types are SQLite, SQL Server, and Azure SQL.
+Production deployment is mainly intended for IIS or Azure.
+
+Containerization with Docker is more or less an exercise in Linux system administration that is often at odds with Microsoft's design principles.
+Here are some of the design challenges faced and their workarounds.
+
+### Application Configuration
+
+The usage of `appsettings*.json` files in ASP.NET encourages the bad practice of exposing application secrets in code repositories.
+It is possible, however, to configure these settings with environment variables.
+To handle nested JSON structures, a double underscore is used to concatenate keys, e.g., `ConnectionStrings__umbracoDbDSN`.
+
+### SQL Server in Docker
+
+Most official Docker images for databases, such as [PostgreSQL][docker-postgres] and [MySQL][docker-mysql], have an option to specify the default database name via environment variable.
+[Microsoft SQL Server][docker-mssql-server], however, has no such option and will not create any database automatically on startup.
+This [issue][github-mssql-docker] has been unresolved for over 7 years!
+
+To work around this, there is an extra service called `db-init` to create the database if it does not exist already.
+Its sole purpose is to run the following T-SQL code and exit.
+
+```sql
+IF NOT EXISTS (SELECT 1 FROM sys.databases WHERE name = 'UmbracoCMS')
+    CREATE DATABASE UmbracoCMS
+```
+
+In many production scenarios it is preferable to use an external database.
+This Docker Compose solution is mainly provided for the sake of completeness.
 
 <!-- Link definitions -->
 
