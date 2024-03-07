@@ -76,13 +76,34 @@ The usage of `appsettings*.json` files in ASP.NET encourages the bad practice of
 It is possible, however, to configure these settings with environment variables.
 To handle nested JSON structures, a double underscore is used to concatenate keys, e.g., `ConnectionStrings__umbracoDbDSN`.
 
+### Runtime Mode Validation
+
+Umbraco has its own [runtime modes][umbraco-runtime-modes], separate from the usual [ASP.NET Core environments][aspnetcore-environments].
+Selecting `Production` mode will enable several runtime mode validators, two of which are problematic:
+
+1. `UmbracoApplicationUrlValidator` -
+    Most web applications are designed to work regardless of what IP address and port number they happen to be running on.
+    Likewise, it is unreasonable for Umbraco to require external information such as the application URL.
+2. `UseHttpsValidator` -
+    Unless you have specific security requirements, HTTPS is better left to a reverse-proxy server, such as [nginx](https://nginx.org), rather than the application itself.
+
+Fortunately, these validators can be disabled with the following code in `Program.cs`:
+
+```cs
+using Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
+
+umbracoBuilder.RuntimeModeValidators()
+    .Remove<UmbracoApplicationUrlValidator>()
+    .Remove<UseHttpsValidator>();
+```
+
 ### SQL Server in Docker
 
 Most official Docker images for databases, such as [PostgreSQL][docker-postgres] and [MySQL][docker-mysql], have an option to specify the default database name via environment variable.
 [Microsoft SQL Server][docker-mssql-server], however, has no such option and will not create any database automatically on startup.
 This [issue][github-mssql-docker] has been unresolved for over 7 years!
 
-To work around this, there is an extra service called `db-init` to create the database if it does not exist already.
+To work around this, there is an extra service in [`docker-compose.yml`](docker-compose.yml) called `db-init` to create the database if it does not exist already.
 Its sole purpose is to run the following T-SQL code and exit.
 
 ```sql
@@ -95,9 +116,11 @@ This Docker Compose solution is mainly provided for the sake of completeness.
 
 <!-- Link definitions -->
 
+[aspnetcore-environments]: <https://learn.microsoft.com/en-us/aspnet/core/fundamentals/environments?view=aspnetcore-8.0> "Use multiple environments in ASP.NET Core | Microsoft Learn"
 [connection-string-syntax]: <https://learn.microsoft.com/en-us/sql/connect/ado-net/connection-strings?view=sql-server-ver16#connection-string-syntax> "Connection strings - ADO.NET Provider for SQL Server | Microsoft Learn"
 [docker-mysql]: <https://hub.docker.com/_/mysql> "mysql - Official Image | Docker Hub"
 [docker-postgres]: <https://hub.docker.com/_/postgres> "postgres - Official Image | Docker Hub"
 [docker-mssql-server]: <https://hub.docker.com/_/microsoft-mssql-server> "microsoft-mssql-server - Official Image | Docker Hub"
 [github-mssql-docker]: <https://github.com/microsoft/mssql-docker/issues/2> "Creating a database automatically upon startup · Issue #2 · microsoft/mssql-docker"
 [umbraco-cms]: <https://umbraco.com/> "Umbraco - the flexible open-source .NET (ASP.NET Core) CMS"
+[umbraco-runtime-modes]: <https://docs.umbraco.com/umbraco-cms/fundamentals/setup/server-setup/runtime-modes> "Runtime Modes - Umbraco CMS"

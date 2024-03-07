@@ -1,3 +1,5 @@
+using Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
+
 var builder = WebApplication.CreateBuilder(args);
 var umbracoBuilder = builder.CreateUmbracoBuilder();
 
@@ -6,7 +8,9 @@ umbracoBuilder
     .AddWebsite()
     .AddDeliveryApi()
     .AddComposers();
-umbracoBuilder.RuntimeModeValidators().Clear();
+umbracoBuilder.RuntimeModeValidators()
+    .Remove<UmbracoApplicationUrlValidator>()
+    .Remove<UseHttpsValidator>();
 umbracoBuilder.Build();
 
 var app = builder.Build();
